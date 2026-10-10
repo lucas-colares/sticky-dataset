@@ -27,13 +27,13 @@ This repository is an image-and-annotation release from those field data. Its cl
 | Property | Contents |
 | --- | --- |
 | Task | Object detection with taxonomic class assignment |
-| Images | 4,771 JPEG files |
+| Annotated training/validation images | 4,771 JPEG files |
 | Training split | 3,817 images and 3,817 matching label files |
 | Validation split | 954 images and 954 matching label files |
 | Classes | 14 arthropod categories |
 | Annotation format | YOLO bounding boxes in plain-text files |
 | Configuration | [`data.yaml`](data.yaml) |
-| Independent test split | Not included |
+| Unlabeled test images | 600 crops from 30 photographs and 15 held-out traps; see [`test/README.md`](test/README.md) |
 
 Counts refer to repository revision [`86d450d`](https://github.com/lucas-colares/sticky-dataset/tree/86d450df1ff84c1c10c57fa0a32b57c7a4be9e4f). Image counts are file counts, not counts of independent traps or sampling locations.
 
@@ -46,13 +46,19 @@ sticky-dataset/
 │   ├── images/       # Training JPEGs
 │   ├── labels/       # Matching YOLO TXT annotations
 │   └── labels.cache
-└── val/
+├── val/
     ├── images/       # Validation JPEGs
     ├── labels/       # Matching YOLO TXT annotations
     └── labels.cache
+└── test/
+    ├── images/       # 600 unlabeled crops
+    ├── crop_manifest.csv
+    ├── source_audit.csv
+    ├── content_match_audit.json
+    └── README.md
 ```
 
-Each image and its annotation share the same filename stem, for example `train/images/A000A2-A_1.jpg` and `train/labels/A000A2-A_1.txt`. The `.cache` files are auxiliary label caches; the TXT files contain the annotations.
+Each annotated training/validation image and its annotation share the same filename stem, for example `train/images/A000A2-A_1.jpg` and `train/labels/A000A2-A_1.txt`. The `.cache` files are auxiliary label caches; the TXT files contain the annotations.
 
 ## Classes
 
@@ -99,7 +105,7 @@ cd sticky-dataset
 
 Use `train/images` and `train/labels` for training, and `val/images` and `val/labels` for validation. Configure your training software to resolve these paths from the downloaded dataset root, and preserve the class order above.
 
-The supplied `data.yaml` also declares `test: test/images`, but this release has no `test/` directory. Omit that entry in a local training configuration unless you supply a separate test set.
+The supplied `data.yaml` declares `test: test/images`. The new [`test/`](test/README.md) release contains 600 unlabeled crops for inference and qualitative review. It has no reference labels and cannot support quantitative test metrics until reviewed annotations are added. Its photographs and trap IDs were screened against the existing splits; some location codes are shared, so this is not a completely site-independent evaluation.
 
 **Known annotation issue:** [`train/labels/F3T01A5-B_12.txt`](train/labels/F3T01A5-B_12.txt) contains a row with `NA` instead of an integer class ID. Review and correct the taxonomic assignment, or exclude the affected image and label from your local training copy. Do not silently convert the unresolved class to another category.
 
